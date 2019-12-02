@@ -15,14 +15,12 @@ const app = next({
 const handler = app.getRequestHandler();
 const sentiment = new Sentiment();
 
-// Ensure that your pusher credentials are properly set in the .env file
-// Using the specified variables
 const pusher = new Pusher({
     appId: process.env.PUSHER_APP_ID,
     key: process.env.PUSHER_APP_KEY,
     secret: process.env.PUSHER_APP_SECRET,
     cluster: process.env.PUSHER_APP_CLUSTER,
-    encrypted: true
+    forceTLS: true
 });
 
 app.prepare()
@@ -38,6 +36,35 @@ app.prepare()
 
         server.get('*', (req, res) => {
             return handler(req, res);
+        });
+
+        const chatHistory = {
+            messages: []
+        };
+
+        server.post('/message', (req, res, next) => {
+            const {
+                user = null, messages = '', timeStamp = +new Date
+            } = req.body;
+            const sentimentScore = sentiment.analyze(messages).score
+            const chat = {
+                user,
+                message,
+                timestamp,
+                sentiment: sentimentScore
+            };
+
+            chatHistory.messages.push(chat);
+            pusher.trigger('chat-room', 'new-message', {
+                chat
+            });
+        });
+
+        server.post('/messages', (req, res, next) => {
+            res.json({
+                ...chatHistory,
+                status: 'success'
+            });
         });
 
         server.listen(port, err => {
