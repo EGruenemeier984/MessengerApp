@@ -25,8 +25,10 @@ const pusher = new Pusher({
 
 app.prepare()
     .then(() => {
-
         const server = express();
+        const chatHistory = {
+            messages: []
+        };
 
         server.use(cors());
         server.use(bodyParser.json());
@@ -38,15 +40,10 @@ app.prepare()
             return handler(req, res);
         });
 
-        const chatHistory = {
-            messages: []
-        };
-
+    
         server.post('/message', (req, res, next) => {
-            const {
-                user = null, messages = '', timeStamp = +new Date
-            } = req.body;
-            const sentimentScore = sentiment.analyze(messages).score
+            const { user = null, message = '', timeStamp = (+new Date) } = req.body;
+            const sentimentScore = sentiment.analyze(message).score
             const chat = {
                 user,
                 message,
@@ -55,16 +52,11 @@ app.prepare()
             };
 
             chatHistory.messages.push(chat);
-            pusher.trigger('chat-room', 'new-message', {
-                chat
-            });
+            pusher.trigger('chat-room', 'new-message', { chat });
         });
 
         server.post('/messages', (req, res, next) => {
-            res.json({
-                ...chatHistory,
-                status: 'success'
-            });
+            res.json({ ...chatHistory, status: 'success' });
         });
 
         server.listen(port, err => {

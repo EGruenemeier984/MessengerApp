@@ -7,7 +7,7 @@ class IndexPage extends Component {
     state = { user: null }
 
     handleKeyUp = evt => {
-        if(evt.keyCode == 13) {
+        if(evt.keyCode === 13) {
             const user = evt.target.value;
             this.setState({ user });
         }
@@ -46,21 +46,14 @@ class IndexPage extends Component {
                           : `What is your name?`
                       }
                     </span>
-                    
-                    { !user && <input type="text" className="form-control mt-3 px-3 py-2" onKeyUp={this.handleKeyUp} autoComplete="off" style={nameInputStyles} /> }
-                    
+                    { !user && <input type="text" className="form-control mt-3 px-3 py-2" onKeyUp={this.handleKeyUp} autoComplete="off" style={nameInputStyles} /> }       
                   </div>
                 </section>
-                
                 <section className="col-md-4 position-relative d-flex flex-wrap h-100 align-items-start align-content-between bg-white px-0">
                     { user && <Chat activeUser={user} /> }
                 </section>
-
-                
               </div>
-              
             </main>
-            
           </Layout>
         );
     }

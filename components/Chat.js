@@ -12,7 +12,6 @@ class Chat extends Component {
     state = { chats: [] }
     
     componentDidMount() {
-    
       this.pusher = new Pusher(process.env.PUSHER_APP_KEY, {
         cluster: process.env.PUSHER_APP_CLUSTER,
         forceTLS: true
@@ -43,7 +42,7 @@ class Chat extends Component {
     handleKeyUp = evt => {
         const value = evt.target.value;
 
-        if(evt.keyCode == 13 && !evt.shiftKey){
+        if(evt.keyCode === 13 && !evt.shiftKey){
             const { activeUser: user } = this.props;
             const chat = { user, message: value, timestamp: +new Date };
 
@@ -51,6 +50,8 @@ class Chat extends Component {
             axios.post('/messages', chat);
         }
     }
+
+    
 
     render() {
         return (this.props.activeUser && <Fragment>
@@ -83,14 +84,10 @@ class Chat extends Component {
                 <span>{chat.user || 'Anonymous'}</span>
               </div>
             ) }
-            
             <ChatMessage message={chat.message} position={position} />
-            
           </Fragment>
         );
-        
-      })}
-      
+      })}      
     </div>
     
           
